@@ -64,6 +64,7 @@ fpca_format = function(data){
       suppressWarnings()
   }
 
-  colnames(return_tibble) = c("uid", "Time", paste0("Component", 1:2))
-  return(tibble(uid, Component1, Component2, Time))
+  colnames(return_tibble) = c("uid", "Time", paste0("Component", 1:C))
+  # return(tibble(uid, Component1, Component2, Time))
+  return(return_tibble)
 }

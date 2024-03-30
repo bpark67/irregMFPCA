@@ -15,7 +15,7 @@ long_format = function(dat){
     na.omit() %>%
     mutate(id = "1") %>%
     `colnames<-`(c("value", "t", "id")) %>%
-    select("id", "t", "value")
+    dplyr::select("id", "t", "value")
 
   # Iterate over remaining columns
   for(i in 2:N){
@@ -24,7 +24,7 @@ long_format = function(dat){
               na.omit() %>%
               mutate(id = i) %>%
               `colnames<-`(c("value", "t", "id")) %>%
-              select("id", "t", "value")
+              dplyr::select("id", "t", "value")
       )
   }
 

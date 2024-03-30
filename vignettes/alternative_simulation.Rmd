@@ -1,0 +1,213 @@
+---
+title: "alternative_simulation"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{alternative_simulation}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(irregMFPCA)
+library(tidyverse)
+library(fda)
+library(fdapace)
+library(MFPCA)
+```
+
+```{r}
+set.seed(16)
+```
+
+## Generate Mean Function
+
+$$
+\mu_X(t) = -2(t-0.5)^2 + 5 \text{ for }t \in [0,1]
+$$
+
+```{r}
+TT = 500
+t = seq(0, 1, length.out = TT)
+mu_X = -2*(t-0.5)^2 + 5
+```
+
+## Generate Eigenfunctions and Eigenscores
+
+$$
+\phi^X_1(t) = \sqrt{2}\sin(\pi t), \ \phi^X_2(t) = \sqrt{2}\sin(7\pi t), \ \phi^X_3(t) = \sqrt{2}\cos(7\pi t) 
+$$
+
+```{r}
+phi_X = matrix(0, nrow = TT, ncol = 3)
+phi_X[,1] = sqrt(2/TT)*sin(pi*t)
+phi_X[,2] = sqrt(2/TT)*sin(7*pi*t)
+phi_X[,3] = sqrt(2/TT)*cos(7*pi*t)
+
+n = 400
+lambda1 = 40; lambda2 = 10; lambda3 = 1
+xi_X = matrix(0, nrow = n, ncol = 3)
+xi_X[,1] = rnorm(n, 0, lambda1)
+xi_X[,2] = rnorm(n, 0, lambda2)
+xi_X[,3] = rnorm(n, 0, lambda3)
+
+X = t(phi_X %*% t(xi_X)) + rep(mu_X, n)
+
+phi_X %>%
+  as.data.frame() %>%
+  ggplot(aes(x = t)) +
+  geom_line(aes(y = V1), col = "red") +
+  geom_line(aes(y = V2), col = "blue") +
+  geom_line(aes(y = V3), col = "green") +
+  theme_bw()
+
+plot(mu_X)
+```
+
+
+## Generate Response
+
+```{r}
+mu_Y = 6*exp(-(t-1)^2)
+
+phi_Y = matrix(0, nrow = TT, ncol = 3)
+phi_Y[,1] = sqrt(2/TT)*cos(9*pi*t)
+phi_Y[,2] = sqrt(2/TT)*sin(5*pi*t)
+phi_Y[,3] = sqrt(2/TT)*cos(2*pi*t)
+
+phi_Y %>%
+  as.data.frame() %>%
+  ggplot(aes(x = t)) +
+  geom_line(aes(y = V1), col = "red") +
+  geom_line(aes(y = V2), col = "blue") +
+  geom_line(aes(y = V3), col = "green") +
+  theme_bw()
+
+xi_Y = matrix(0, nrow = n, ncol = 3)
+xi_Y[,1] = rnorm(n, 0, lambda1)
+xi_Y[,2] = rnorm(n, 0, lambda2)
+xi_Y[,3] = rnorm(n, 0, lambda3)
+```
+
+## Noise
+
+```{r}
+sigma = 0.1
+n_eig_X = 3
+n_eig_Y = 3
+```
+
+## Regression
+
+```{r}
+# Generate B matrix from Unif(-U, U)
+U = 3
+B = matrix(sample(seq(-choice, choice, 0.01),n_eig_X*n_eig_Y),
+           nrow = n_eig_Y,
+           ncol = n_eig_X)
+
+epsilon = matrix(rnorm(n_eig_Y*n, mean = 0, sd = 0.01), 
+                 n_eig_Y, 
+                 n)
+
+Y = matrix(nrow = n, 
+           ncol = TT)
+```
+
+### Introduce Outliers
+
+```{r}
+outliers = 20
+non_outliers = n - outliers
+
+for (i in 1:non_outliers){
+  Y[i,] = t(B%*%xi_X[i,])%*%t(phi_Y) + mu_Y + t(phi_Y%*%epsilon[,i])
+}
+```
+
+## Scenarios
+
+```{r}
+scenario = 1
+
+if (scenario==1){
+  outlier_var = 0.5
+  B_out = B + matrix(rnorm(n_eig_X*n_eig_Y, mean = 0, sd = outlier_var),
+                     nrow = n_eig_Y,
+                     ncol = n_eig_X)
+  
+  for (i in (non_outliers+1):n){
+    Y[i,] = t(B_out%*%xi_X[i,])%*%t(phi_Y) + mu_Y + t(phi_Y%*%epsilon[,i]) 
+  }
+}
+
+if (scenario==2){
+  gaittime = seq(0, 1, len=TT)
+  gaitrange = c(0,1)
+  nord = 10
+  gaitbasis = create.bspline.basis(c(0,1), nbasis = nord, norder = 3)
+  evaluated_basis = eval.basis(gaitbasis, gaittime)
+  normalised_basis = eval.basis(gaitbasis, gaittime)
+  
+  values = diag(inprod(gaitbasis,gaitbasis)*TT)
+  intu = sample(nord, 1)
+  
+  out_basis = normalised_basis[, intu]
+  
+  B_out = rbind(B, rnorm(3,3,1))
+  
+  for (i in (non_outliers+1):n){
+    Y[i,] = t(cbind(phi_Y, out_basis/values[intu]) %*% (B_out %*% xi_X[i,]) + mu_Y) + t(phi_Y%*%epsilon[,i])
+  }
+}
+```
+
+
+```{r}
+E = matrix(rnorm(TT*n, mean = 0, sd = sigma), n, TT)
+
+Y =  Y + E
+X.all = X + E
+```
+
+
+```{r}
+#### plot Predictior and Response curves ####
+
+matplot(t(X.all), type='l', ylab='X(t)', xlab='time', main='Plot of predictor curves', col=rgb(0,0,0,alpha=0.4))
+matlines(t(X.all[(non_outliers+1):n,]), type='l', lwd=3, lty=1)
+
+matplot(t(Y), type='l', ylab='Y(t)', xlab='time', main='Plot of response curves', col=rgb(0,0,0,alpha=0.6))
+matlines(t(Y[(non_outliers+1):n,]), type='l', lwd=3, lty=1)
+```
+
+
+```{r}
+X_t = rbind(X, t)
+
+df = X_t %>% tibble_format(tindex = t) %>% fpca_format()
+```
+
+```{r}
+# res = FPCA(df$Component1,
+#            df$Time, 
+#            list(dataType='Sparse', 
+#                 error=FALSE, 
+#                 kernel='epan', 
+#                 verbose=TRUE))
+```
+
+
+
+
+
+
+
+
+
