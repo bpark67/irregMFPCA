@@ -51,7 +51,7 @@ normalizer = function(mat, normal = NULL){
 #' @param seed random seed
 #'
 #' @return a data with artificial missing value
-#' @noRd
+#' @export
 #'
 missing_data_simulator = function(n_obs,
                                   dat,
@@ -65,14 +65,16 @@ missing_data_simulator = function(n_obs,
   for(i in 1:N){
     s = sample(1:l, l - n_obs)
     S = s
-    for(j in 1:(c-1)){
-      S = c(S, s + j*l)
+    if(c > 1){
+      for(j in 1:(c-1)){
+        S = c(S, s + j*l)
+      }
     }
     dat[i, ][S] = NA
   }
 
   # Add time row
-  dat = rbind(dat, c(t, t))
+  dat = rbind(dat, rep(t, c))
 
   # Transpose and change to data frame
   # dat = dat %>% t() %>% as.data.frame()
@@ -90,7 +92,7 @@ missing_data_simulator = function(n_obs,
 #' @param n_obs number of non-missing observations; must be shorter than t
 #'
 #'
-#' @import dplyr
+#' @importFrom stats rnorm
 #' @return entirely simulated data
 #' @export
 #'

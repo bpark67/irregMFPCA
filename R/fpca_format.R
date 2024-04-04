@@ -4,8 +4,13 @@
 #' @param target target to fill
 #' @param source source to fill from
 #'
+#' @importFrom tibble add_column
+#' @importFrom dplyr filter
+#' @importFrom dplyr select
+#' @importFrom dplyr pull
+#'
 #' @return a filled vector
-#' @export
+#' @noRd
 #'
 vector_filler = function(v, target, source){
   N = length(v)
@@ -26,6 +31,9 @@ vector_filler = function(v, target, source){
 #' @param data original data
 #'
 #' @return an fpca formatted dataset
+#'
+#' @importFrom tsibble as_tibble
+#' @importFrom tibble tibble
 #' @export
 #'
 fpca_format = function(data){

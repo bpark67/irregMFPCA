@@ -2,6 +2,10 @@
 #'
 #' @param dat original data
 #'
+#' @importFrom stats na.omit
+#' @importFrom dplyr mutate
+#' @importFrom dplyr arrange
+#'
 #' @return long formatted data
 #' @noRd
 #'
@@ -13,7 +17,7 @@ long_format = function(dat){
   # Pull out first column, which correponds to first case
   long_data = dat[, c(1, N + 1)] %>%
     na.omit() %>%
-    mutate(id = "1") %>%
+    mutate("id" = "1") %>%
     `colnames<-`(c("value", "t", "id")) %>%
     dplyr::select("id", "t", "value")
 
@@ -22,14 +26,14 @@ long_format = function(dat){
     long_data = long_data %>%
       rbind(dat[, c(i, N + 1)] %>%
               na.omit() %>%
-              mutate(id = i) %>%
+              mutate("id" = i) %>%
               `colnames<-`(c("value", "t", "id")) %>%
               dplyr::select("id", "t", "value")
       )
   }
 
   long_data$id = as.numeric(long_data$id)
-  long_data = long_data %>% arrange(id)
+  long_data = long_data %>% arrange("id")
   return(long_data)
 }
 
@@ -40,7 +44,8 @@ long_format = function(dat){
 #'
 #' @return a tibble formatted data
 #' @export
-#' @import tidyverse
+#' @importFrom purrr reduce
+#' @importFrom dplyr left_join
 #' @import brolgar
 #'
 #'
