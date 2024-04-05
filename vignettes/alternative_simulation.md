@@ -61,14 +61,14 @@ phi_X1 %>%
   theme_bw()
 ```
 
-![](alternative_simulation_files/figure-gfm/unnamed-chunk-51-1.png)<!-- -->
+![](alternative_simulation_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
 
 ``` r
 
 plot(mu_X1)
 ```
 
-![](alternative_simulation_files/figure-gfm/unnamed-chunk-51-2.png)<!-- -->
+![](alternative_simulation_files/figure-gfm/unnamed-chunk-5-2.png)<!-- -->
 
 ``` r
 
@@ -94,14 +94,14 @@ phi_X2 %>%
   theme_bw()
 ```
 
-![](alternative_simulation_files/figure-gfm/unnamed-chunk-51-3.png)<!-- -->
+![](alternative_simulation_files/figure-gfm/unnamed-chunk-5-3.png)<!-- -->
 
 ``` r
 
 plot(mu_X2)
 ```
 
-![](alternative_simulation_files/figure-gfm/unnamed-chunk-51-4.png)<!-- -->
+![](alternative_simulation_files/figure-gfm/unnamed-chunk-5-4.png)<!-- -->
 
 ## Generate Response
 
@@ -139,14 +139,14 @@ phi_Y1 %>%
   theme_bw()
 ```
 
-![](alternative_simulation_files/figure-gfm/unnamed-chunk-52-1.png)<!-- -->
+![](alternative_simulation_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
 
 ``` r
 
 plot(mu_Y1)
 ```
 
-![](alternative_simulation_files/figure-gfm/unnamed-chunk-52-2.png)<!-- -->
+![](alternative_simulation_files/figure-gfm/unnamed-chunk-6-2.png)<!-- -->
 
 ``` r
 
@@ -170,14 +170,14 @@ phi_Y2 %>%
   theme_bw()
 ```
 
-![](alternative_simulation_files/figure-gfm/unnamed-chunk-52-3.png)<!-- -->
+![](alternative_simulation_files/figure-gfm/unnamed-chunk-6-3.png)<!-- -->
 
 ``` r
 
 plot(mu_Y2)
 ```
 
-![](alternative_simulation_files/figure-gfm/unnamed-chunk-52-4.png)<!-- -->
+![](alternative_simulation_files/figure-gfm/unnamed-chunk-6-4.png)<!-- -->
 
 ``` r
 
@@ -300,7 +300,7 @@ matlines(t(X.all[(non_outliers+1):n,]),
          lty=1)
 ```
 
-![](alternative_simulation_files/figure-gfm/unnamed-chunk-59-1.png)<!-- -->
+![](alternative_simulation_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
 
 ``` r
 
@@ -316,7 +316,7 @@ matlines(t(Y[(non_outliers+1):n,]),
          lty=1)
 ```
 
-![](alternative_simulation_files/figure-gfm/unnamed-chunk-59-2.png)<!-- -->
+![](alternative_simulation_files/figure-gfm/unnamed-chunk-13-2.png)<!-- -->
 
 ### MFPCA
 
@@ -372,7 +372,7 @@ hat %>%
   theme_bw()
 ```
 
-![](alternative_simulation_files/figure-gfm/unnamed-chunk-63-1.png)<!-- -->
+![](alternative_simulation_files/figure-gfm/unnamed-chunk-17-1.png)<!-- -->
 
 ``` r
 
@@ -386,7 +386,7 @@ res1$phi[, 1:3] %>%
   theme_bw()
 ```
 
-![](alternative_simulation_files/figure-gfm/unnamed-chunk-63-2.png)<!-- -->
+![](alternative_simulation_files/figure-gfm/unnamed-chunk-17-2.png)<!-- -->
 
 ``` r
 
@@ -398,7 +398,7 @@ res1$phi[, 1:3] %>%
   theme_bw()
 ```
 
-![](alternative_simulation_files/figure-gfm/unnamed-chunk-63-3.png)<!-- -->
+![](alternative_simulation_files/figure-gfm/unnamed-chunk-17-3.png)<!-- -->
 
 ``` r
 
@@ -410,7 +410,7 @@ res1$phi[, 1:3] %>%
   theme_bw()
 ```
 
-![](alternative_simulation_files/figure-gfm/unnamed-chunk-63-4.png)<!-- -->
+![](alternative_simulation_files/figure-gfm/unnamed-chunk-17-4.png)<!-- -->
 
 ### Compare to Actual: Second Component
 
@@ -422,7 +422,7 @@ hat %>%
   theme_bw()
 ```
 
-![](alternative_simulation_files/figure-gfm/unnamed-chunk-64-1.png)<!-- -->
+![](alternative_simulation_files/figure-gfm/unnamed-chunk-18-1.png)<!-- -->
 
 ``` r
 
@@ -436,7 +436,7 @@ res2$phi[, 1:3] %>%
   theme_bw()
 ```
 
-![](alternative_simulation_files/figure-gfm/unnamed-chunk-64-2.png)<!-- -->
+![](alternative_simulation_files/figure-gfm/unnamed-chunk-18-2.png)<!-- -->
 
 ``` r
 
@@ -448,7 +448,7 @@ res2$phi[, 1:3] %>%
   theme_bw()
 ```
 
-![](alternative_simulation_files/figure-gfm/unnamed-chunk-64-3.png)<!-- -->
+![](alternative_simulation_files/figure-gfm/unnamed-chunk-18-3.png)<!-- -->
 
 ``` r
 
@@ -460,7 +460,7 @@ res2$phi[, 1:3] %>%
   theme_bw()
 ```
 
-![](alternative_simulation_files/figure-gfm/unnamed-chunk-64-4.png)<!-- -->
+![](alternative_simulation_files/figure-gfm/unnamed-chunk-18-4.png)<!-- -->
 
 ## Irregular MFPCA
 
@@ -477,7 +477,7 @@ mfpca_res = irregMFPCA::irregMFPCA(components = 2,
 mfpca_eigenf = mfpca_res$unstackpsi
 colnames(mfpca_eigenf) = c("component_1_1", "component_1_2", "component_2_1", "component_2_2")
 mfpca_eigens = mfpca_res$rho
-colnames(mfpca_eigens) = c("component_1", "component_2")
+colnames(mfpca_eigens) = c("function_1", "function_2")
 ```
 
 ``` r
@@ -490,7 +490,7 @@ mfpca_eigenf %>%
   theme_bw()
 ```
 
-![](alternative_simulation_files/figure-gfm/unnamed-chunk-67-1.png)<!-- -->
+![](alternative_simulation_files/figure-gfm/unnamed-chunk-21-1.png)<!-- -->
 
 ``` r
 
@@ -502,7 +502,7 @@ mfpca_eigenf %>%
   theme_bw()
 ```
 
-![](alternative_simulation_files/figure-gfm/unnamed-chunk-67-2.png)<!-- -->
+![](alternative_simulation_files/figure-gfm/unnamed-chunk-21-2.png)<!-- -->
 
 ``` r
 
@@ -515,7 +515,7 @@ mfpca_eigenf %>%
   theme_bw()
 ```
 
-![](alternative_simulation_files/figure-gfm/unnamed-chunk-67-3.png)<!-- -->
+![](alternative_simulation_files/figure-gfm/unnamed-chunk-21-3.png)<!-- -->
 
 ``` r
 
@@ -527,27 +527,27 @@ mfpca_eigenf %>%
   theme_bw()
 ```
 
-![](alternative_simulation_files/figure-gfm/unnamed-chunk-67-4.png)<!-- -->
+![](alternative_simulation_files/figure-gfm/unnamed-chunk-21-4.png)<!-- -->
 
 ``` r
 mfpca_eigens %>%
   as.data.frame() %>%
   ggplot()+
-  geom_line(aes(x = seq(1, 99), y = component_1), col = "red", linetype = "dotted") +
+  geom_line(aes(x = seq(1, 99), y = function_1), col = "red", linetype = "dotted") +
   geom_line(data = as.data.frame(xi_X1), aes(x = seq(1, 99), y = V1), col = "black") +
   theme_bw()
 ```
 
-![](alternative_simulation_files/figure-gfm/unnamed-chunk-68-1.png)<!-- -->
+![](alternative_simulation_files/figure-gfm/unnamed-chunk-22-1.png)<!-- -->
 
 ``` r
 
 mfpca_eigens %>%
   as.data.frame() %>%
   ggplot()+
-  geom_line(aes(x = seq(1, 99), y = component_2), col = "red", linetype = "dotted") +
+  geom_line(aes(x = seq(1, 99), y = function_2), col = "red", linetype = "dotted") +
   geom_line(data = as.data.frame(xi_X1), aes(x = seq(1, 99), y = V2), col = "black") +
   theme_bw()
 ```
 
-![](alternative_simulation_files/figure-gfm/unnamed-chunk-68-2.png)<!-- -->
+![](alternative_simulation_files/figure-gfm/unnamed-chunk-22-2.png)<!-- -->
