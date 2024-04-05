@@ -20,46 +20,53 @@ library(tidyverse)
 library(fda)
 library(fdapace)
 library(MFPCA)
-```
-
-```{r}
 set.seed(16)
 ```
 
-## Generate Mean Function
+## Generate Mean Functions
 
 $$
-\mu_X(t) = -2(t-0.5)^2 + 5 \text{ for }t \in [0,1]
+\mu_{X_1}(t) = -2(t-0.5)^2 + 5 \text{ for }t \in [0,1]
 $$
+
+$$
+\mu_{X_2}(t) = 3(t-0.75)^3 + 0.1 \text{ for }t \in [0,1]
+$$
+
 
 ```{r}
 TT = 100
 t = seq(0, 1, length.out = TT)
-mu_X = -2*(t-0.5)^2 + 5
+mu_X1 = -2*(t-0.5)^2 + 5
+mu_X2 = 3*(t-0.75)^3 + 0.1
 ```
 
 ## Generate Eigenfunctions and Eigenscores
 
 $$
-\phi^X_1(t) = \sqrt{2}\sin(\pi t), \ \phi^X_2(t) = \sqrt{2}\sin(7\pi t), \ \phi^X_3(t) = \sqrt{2}\cos(7\pi t) 
+\phi^{X_1}_1(t) = \sqrt{2}\sin(\pi t), \ \phi^{X_1}_2(t) = \sqrt{2}\sin(7\pi t), \ \phi^{X_1}_3(t) = \sqrt{2}\cos(7\pi t) 
+$$
+
+$$
+\phi^{X_2}_1(t) = \sqrt{2}\cos(5\pi t), \ \phi^{X_2}_2(t) = \sqrt{2}\cos(\pi t), \ \phi^{X_2}_3(t) = \sqrt{2}\sin(7\pi t) 
 $$
 
 ```{r}
-phi_X = matrix(0, nrow = TT, ncol = 3)
-phi_X[,1] = sqrt(2/TT)*sin(pi*t)
-phi_X[,2] = sqrt(2/TT)*sin(7*pi*t)
-phi_X[,3] = sqrt(2/TT)*cos(7*pi*t)
+phi_X1 = matrix(0, nrow = TT, ncol = 3)
+phi_X1[,1] = sqrt(2/TT)*sin(pi*t)
+phi_X1[,2] = sqrt(2/TT)*sin(7*pi*t)
+phi_X1[,3] = sqrt(2/TT)*cos(7*pi*t)
 
-n = 400
-lambda1 = 40; lambda2 = 10; lambda3 = 1
-xi_X = matrix(0, nrow = n, ncol = 3)
-xi_X[,1] = rnorm(n, 0, lambda1)
-xi_X[,2] = rnorm(n, 0, lambda2)
-xi_X[,3] = rnorm(n, 0, lambda3)
+n = 99
+lambda11 = 40; lambda21 = 10; lambda31 = 1
+xi_X1 = matrix(0, nrow = n, ncol = 3)
+xi_X1[,1] = rnorm(n, 0, lambda11)
+xi_X1[,2] = rnorm(n, 0, lambda21)
+xi_X1[,3] = rnorm(n, 0, lambda31)
 
-X = t(phi_X %*% t(xi_X)) + rep(mu_X, n)
+X1 = t(phi_X1 %*% t(xi_X1)) + rep(mu_X1, n) #TODO: Check this line; slightly different generation
 
-phi_X %>%
+phi_X1 %>%
   as.data.frame() %>%
   ggplot(aes(x = t)) +
   geom_line(aes(y = V1), col = "red") +
@@ -67,21 +74,62 @@ phi_X %>%
   geom_line(aes(y = V3), col = "green") +
   theme_bw()
 
-plot(mu_X)
+plot(mu_X1)
+
+phi_X2 = matrix(0, nrow = TT, ncol = 3)
+phi_X2[,1] = sqrt(2/TT)*cos(5*pi*t)
+phi_X2[,2] = sqrt(2/TT)*cos(pi*t)
+phi_X2[,3] = sqrt(2/TT)*sin(7*pi*t)
+
+# lambda12 = 2; lambda22 = 20; lambda32 = 50
+# xi_X2 = matrix(0, nrow = n, ncol = 3)
+# xi_X2[,1] = rnorm(n, 0, lambda12)
+# xi_X2[,2] = rnorm(n, 0, lambda22)
+# xi_X2[,3] = rnorm(n, 0, lambda32)
+
+X2 = t(phi_X2 %*% t(xi_X1)) + rep(mu_X2, n)
+
+phi_X2 %>%
+  as.data.frame() %>%
+  ggplot(aes(x = t)) +
+  geom_line(aes(y = V1), col = "red") +
+  geom_line(aes(y = V2), col = "blue") +
+  geom_line(aes(y = V3), col = "green") +
+  theme_bw()
+
+plot(mu_X2)
 ```
 
 
 ## Generate Response
 
+$$
+\mu_{Y_1}(t) = 6\exp(-(t-1)^2)
+$$
+
+$$
+\mu_{Y_2}(t) = -2\cdot 14^{(t-0.5)}
+$$
+
+$$
+\phi^{Y_1}_1(t) = \sqrt{2}\cos(9\pi t), \ \phi^{Y_1}_2(t) = \sqrt{2}\sin(5\pi t), \ \phi^{Y_1}_3(t) = \sqrt{2}\cos(2\pi t)
+$$
+
+$$
+\phi^{Y_2}_1(t) = \sqrt{2}\sin(3\pi t), \ \phi^{Y_2}_2(t) = \sqrt{2}\cos(\pi t), \ \phi^{Y_2}_3(t) = \sqrt{2}\sin(7\pi t)
+$$
+
+
 ```{r}
-mu_Y = 6*exp(-(t-1)^2)
+mu_Y1 = 6*exp(-(t-1)^2)
+mu_Y2 = -2*14^(t-0.5)
 
-phi_Y = matrix(0, nrow = TT, ncol = 3)
-phi_Y[,1] = sqrt(2/TT)*cos(9*pi*t)
-phi_Y[,2] = sqrt(2/TT)*sin(5*pi*t)
-phi_Y[,3] = sqrt(2/TT)*cos(2*pi*t)
+phi_Y1 = matrix(0, nrow = TT, ncol = 3)
+phi_Y1[,1] = sqrt(2/TT)*cos(9*pi*t)
+phi_Y1[,2] = sqrt(2/TT)*sin(5*pi*t)
+phi_Y1[,3] = sqrt(2/TT)*cos(2*pi*t)
 
-phi_Y %>%
+phi_Y1 %>%
   as.data.frame() %>%
   ggplot(aes(x = t)) +
   geom_line(aes(y = V1), col = "red") +
@@ -89,11 +137,47 @@ phi_Y %>%
   geom_line(aes(y = V3), col = "green") +
   theme_bw()
 
-xi_Y = matrix(0, nrow = n, ncol = 3)
-xi_Y[,1] = rnorm(n, 0, lambda1)
-xi_Y[,2] = rnorm(n, 0, lambda2)
-xi_Y[,3] = rnorm(n, 0, lambda3)
+plot(mu_Y1)
+
+xi_Y1 = matrix(0, nrow = n, ncol = 3)
+xi_Y1[,1] = rnorm(n, 0, lambda11)
+xi_Y1[,2] = rnorm(n, 0, lambda21)
+xi_Y1[,3] = rnorm(n, 0, lambda31)
+
+
+phi_Y2 = matrix(0, nrow = TT, ncol = 3)
+phi_Y2[,1] = sqrt(2/TT)*sin(3*pi*t)
+phi_Y2[,2] = sqrt(2/TT)*cos(pi*t)
+phi_Y2[,3] = sqrt(2/TT)*sin(7*pi*t)
+
+phi_Y2 %>%
+  as.data.frame() %>%
+  ggplot(aes(x = t)) +
+  geom_line(aes(y = V1), col = "red") +
+  geom_line(aes(y = V2), col = "blue") +
+  geom_line(aes(y = V3), col = "green") +
+  theme_bw()
+
+plot(mu_Y2)
+
+# xi_Y2 = matrix(0, nrow = n, ncol = 3)
+# xi_Y2[,1] = rnorm(n, 0, lambda12)
+# xi_Y2[,2] = rnorm(n, 0, lambda22)
+# xi_Y2[,3] = rnorm(n, 0, lambda32)
 ```
+
+## Combine Components
+
+```{r}
+X = cbind(X1, X2)
+phi_X = cbind(phi_X1, phi_X2)
+# xi_X = cbind(xi_X1, xi_X2)
+
+phi_Y = cbind(phi_Y1, phi_Y2)
+# xi_Y = cbind(xi_Y1, xi_Y2)
+mu_Y = c(mu_Y1, mu_Y2)
+```
+
 
 ## Noise
 
@@ -116,8 +200,10 @@ epsilon = matrix(rnorm(n_eig_Y*n, mean = 0, sd = 0.01),
                  n_eig_Y, 
                  n)
 
-Y = matrix(nrow = n, 
-           ncol = TT)
+Y1 = matrix(nrow = n, 
+            ncol = TT)
+Y2 = matrix(nrow = n, 
+            ncol = TT)
 ```
 
 ### Introduce Outliers
@@ -127,9 +213,11 @@ outliers = 20
 non_outliers = n - outliers
 
 for (i in 1:non_outliers){
-  Y[i,] = t(B%*%xi_X[i,])%*%t(phi_Y) + mu_Y + t(phi_Y%*%epsilon[,i])
+  Y1[i,] = t(B%*%xi_X1[i,])%*%t(phi_Y1) + mu_Y1 + t(phi_Y1%*%epsilon[,i])
+  Y2[i,] = t(B%*%xi_X1[i,])%*%t(phi_Y2) + mu_Y2 + t(phi_Y2%*%epsilon[,i])
 }
 ```
+
 
 ## Scenarios
 
@@ -143,34 +231,37 @@ if (scenario==1){
                      ncol = n_eig_X)
   
   for (i in (non_outliers+1):n){
-    Y[i,] = t(B_out%*%xi_X[i,])%*%t(phi_Y) + mu_Y + t(phi_Y%*%epsilon[,i]) 
+    Y1[i,] = t(B_out%*%xi_X1[i,])%*%t(phi_Y1) + mu_Y1 + t(phi_Y1%*%epsilon[,i])
+    Y2[i,] = t(B_out%*%xi_X1[i,])%*%t(phi_Y2) + mu_Y2 + t(phi_Y2%*%epsilon[,i])
   }
 }
 
-if (scenario==2){
-  gaittime = seq(0, 1, len=TT)
-  gaitrange = c(0,1)
-  nord = 10
-  gaitbasis = create.bspline.basis(c(0,1), nbasis = nord, norder = 3)
-  evaluated_basis = eval.basis(gaitbasis, gaittime)
-  normalised_basis = eval.basis(gaitbasis, gaittime)
-  
-  values = diag(inprod(gaitbasis,gaitbasis)*TT)
-  intu = sample(nord, 1)
-  
-  out_basis = normalised_basis[, intu]
-  
-  B_out = rbind(B, rnorm(3,3,1))
-  
-  for (i in (non_outliers+1):n){
-    Y[i,] = t(cbind(phi_Y, out_basis/values[intu]) %*% (B_out %*% xi_X[i,]) + mu_Y) + t(phi_Y%*%epsilon[,i])
-  }
-}
+# if (scenario==2){
+#   gaittime = seq(0, 1, len=TT)
+#   gaitrange = c(0,1)
+#   nord = 10
+#   gaitbasis = create.bspline.basis(c(0,1), nbasis = nord, norder = 3)
+#   evaluated_basis = eval.basis(gaitbasis, gaittime)
+#   normalised_basis = eval.basis(gaitbasis, gaittime)
+#   
+#   values = diag(inprod(gaitbasis,gaitbasis)*TT)
+#   intu = sample(nord, 1)
+#   
+#   out_basis = normalised_basis[, intu]
+#   
+#   B_out = rbind(B, rnorm(3,3,1))
+#   
+#   for (i in (non_outliers+1):n){
+#     Y[i,] = t(cbind(phi_Y, out_basis/values[intu]) %*% (B_out %*% xi_X[i,]) + mu_Y) + t(phi_Y%*%epsilon[,i])
+#   }
+# }
+
+Y = cbind(Y1, Y2)
 ```
 
 
 ```{r}
-E = matrix(rnorm(TT*n, mean = 0, sd = sigma), n, TT)
+E = matrix(rnorm(2*TT*n, mean = 0, sd = sigma), n, 2*TT)
 
 Y =  Y + E
 X.all = X + E
@@ -207,7 +298,7 @@ matlines(t(Y[(non_outliers+1):n,]),
 ### MFPCA
 
 ```{r}
-X_miss = irregMFPCA::missing_data_simulator(n_obs = 10,
+X_miss = irregMFPCA::missing_data_simulator(n_obs = 40,
                                             dat = X.all,
                                             t = seq(0, 1, length.out = TT),
                                             seed = 16)
@@ -217,57 +308,165 @@ df = X_miss %>% tibble_format(tindex = t) %>% fpca_format()
 ```
 
 ```{r}
-res = FPCA(df$Component1,
-           df$Time,
-           list(dataType='Sparse',
-                error=FALSE,
-                kernel='epan',
-                verbose=TRUE))
+res1 = FPCA(df$Component1,
+            df$Time,
+            list(dataType='Sparse',
+                 error=FALSE,
+                 kernel='epan',
+                 verbose=TRUE))
+
+res2 = FPCA(df$Component2,
+            df$Time,
+            list(dataType='Sparse',
+                 error=FALSE,
+                 kernel='epan',
+                 verbose=TRUE))
 ```
 
 ```{r}
-plot(res)
+# plot(res)
 ```
 
-### Compare to Actual
+### Compare to Actual: First Component
 
 ```{r}
-act = data.frame(act = mu_X)
-hat = data.frame(hat = res$mu)
+act = data.frame(act1 = mu_X1,
+                 act2 = mu_X2)
+hat = data.frame(hat1 = res1$mu,
+                 hat2 = res2$mu)
 
 hat %>%
   ggplot() +
-  geom_line(aes(x = 1:51, y = hat)) +
-  geom_line(data = act, aes(x = seq(1, 51, length.out = 100), y = act), linetype = "dashed") +
+  geom_line(aes(x = 1:51, y = hat1)) +
+  geom_line(data = act, aes(x = seq(1, 51, length.out = 100), y = act1), linetype = "dashed") +
   theme_bw()
 
-phi_X_df = phi_X %>% as.data.frame()
+phi_X1_df = phi_X1 %>% as.data.frame()
 
-res$phi[, 1:3] %>%
+res1$phi[, 1:3] %>%
   as.data.frame() %>%
   ggplot() +
   geom_line(aes(x = 1:51, y = V1), col = "red") +
-  geom_line(data = phi_X_df, aes(x = seq(1, 51, length.out = 100), y = V1), col = "red", linetype = "dashed") +
+  geom_line(data = phi_X1_df, aes(x = seq(1, 51, length.out = 100), y = V1), col = "red", linetype = "dashed") +
   theme_bw()
 
-res$phi[, 1:3] %>%
+res1$phi[, 1:3] %>%
   as.data.frame() %>%
   ggplot() +
   geom_line(aes(x = 1:51, y = V2), col = "blue") +
-  geom_line(data = phi_X_df, aes(x = seq(1, 51, length.out = 100), y = V2), col = "blue", linetype = "dashed") +
+  geom_line(data = phi_X1_df, aes(x = seq(1, 51, length.out = 100), y = V2), col = "blue", linetype = "dashed") +
   theme_bw()
 
-res$phi[, 1:3] %>%
+res1$phi[, 1:3] %>%
   as.data.frame() %>%
   ggplot() +
   geom_line(aes(x = 1:51, y = V3), col = "green") +
-  geom_line(data = phi_X_df, aes(x = seq(1, 51, length.out = 100), y = V3), col = "green", linetype = "dashed") +
+  geom_line(data = phi_X1_df, aes(x = seq(1, 51, length.out = 100), y = V3), col = "green", linetype = "dashed") +
   theme_bw()
 
 ```
 
 
+### Compare to Actual: Second Component
 
+```{r}
+hat %>%
+  ggplot() +
+  geom_line(aes(x = 1:51, y = hat2)) +
+  geom_line(data = act, aes(x = seq(1, 51, length.out = 100), y = act2), linetype = "dashed") +
+  theme_bw()
+
+phi_X2_df = phi_X2 %>% as.data.frame()
+
+res2$phi[, 1:3] %>%
+  as.data.frame() %>%
+  ggplot() +
+  geom_line(aes(x = 1:51, y = V1), col = "red") +
+  geom_line(data = phi_X2_df, aes(x = seq(1, 51, length.out = 100), y = V1), col = "red", linetype = "dashed") +
+  theme_bw()
+
+res2$phi[, 1:3] %>%
+  as.data.frame() %>%
+  ggplot() +
+  geom_line(aes(x = 1:51, y = V2), col = "blue") +
+  geom_line(data = phi_X2_df, aes(x = seq(1, 51, length.out = 100), y = V2), col = "blue", linetype = "dashed") +
+  theme_bw()
+
+res2$phi[, 1:3] %>%
+  as.data.frame() %>%
+  ggplot() +
+  geom_line(aes(x = 1:51, y = V3), col = "green") +
+  geom_line(data = phi_X2_df, aes(x = seq(1, 51, length.out = 100), y = V3), col = "green", linetype = "dashed") +
+  theme_bw()
+```
+
+
+## Irregular MFPCA
+
+```{r}
+mfpca_res = irregMFPCA::irregMFPCA(components = 2,
+                                   split = F,
+                                   res1,
+                                   res2)
+```
+
+### Check Results
+
+```{r}
+mfpca_eigenf = mfpca_res$unstackpsi
+colnames(mfpca_eigenf) = c("component_1_1", "component_1_2", "component_2_1", "component_2_2")
+mfpca_eigens = mfpca_res$rho
+colnames(mfpca_eigens) = c("component_1", "component_2")
+```
+
+```{r}
+t = seq(0, 1, length.out = 51)
+mfpca_eigenf %>%
+  as.data.frame() %>%
+  ggplot() +
+  geom_line(aes(x = t, y = component_1_1), col = "red", linetype = "dotted") +
+  geom_line(data = phi_X1_df, aes(x = seq(0, 1, length.out = 100), y =V1), col = "black") +
+  theme_bw()
+
+mfpca_eigenf %>%
+  as.data.frame() %>%
+  ggplot() +
+  geom_line(aes(x = t, y = component_1_2), col = "red", linetype = "dotted") +
+  geom_line(data = phi_X1_df, aes(x = seq(0, 1, length.out = 100), y =V2), col = "black") +
+  theme_bw()
+
+
+mfpca_eigenf %>%
+  as.data.frame() %>%
+  ggplot() +
+  geom_line(aes(x = t, y = component_2_1), col = "blue", linetype = "dotted") +
+  geom_line(data = phi_X2_df, aes(x = seq(0, 1, length.out = 100), y =V1), col = "black") +
+  theme_bw()
+
+mfpca_eigenf %>%
+  as.data.frame() %>%
+  ggplot() +
+  geom_line(aes(x = t, y = component_2_2), col = "blue", linetype = "dotted") +
+  geom_line(data = phi_X2_df, aes(x = seq(0, 1, length.out = 100), y =V2), col = "black") +
+  theme_bw()
+```
+
+
+```{r}
+mfpca_eigens %>%
+  as.data.frame() %>%
+  ggplot()+
+  geom_line(aes(x = seq(1, 99), y = component_1), col = "red", linetype = "dotted") +
+  geom_line(data = as.data.frame(xi_X1), aes(x = seq(1, 99), y = V1), col = "black") +
+  theme_bw()
+
+mfpca_eigens %>%
+  as.data.frame() %>%
+  ggplot()+
+  geom_line(aes(x = seq(1, 99), y = component_2), col = "red", linetype = "dotted") +
+  geom_line(data = as.data.frame(xi_X1), aes(x = seq(1, 99), y = V2), col = "black") +
+  theme_bw()
+```
 
 
 
