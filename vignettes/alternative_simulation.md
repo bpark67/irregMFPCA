@@ -10,6 +10,23 @@ library(MFPCA)
 set.seed(16)
 ```
 
+## Function to Normalize Eigenscores
+
+``` r
+normalizer = function(mat, normal = NULL){
+  if(is.null(normal)){normal = nrow(mat)}
+  
+  lmat = as.list(data.frame(mat))
+  constants = sqrt(normal/sapply(lmat, function(x) sum(x^2)))
+  
+  return(matrix(c(constants[1]*mat[, 1],
+                  constants[2]*mat[, 2],
+                  constants[3]*mat[, 3]), 
+                nrow = nrow(mat),
+                ncol = ncol(mat)))
+}
+```
+
 ## Generate Mean Functions
 
 $$
@@ -17,14 +34,14 @@ $$
 $$
 
 $$
-\mu_{X_2}(t) = 3(t-0.75)^3 + 0.1 \text{ for }t \in [0,1]
+\mu_{X_2}(t) = 3(t-0.75)^3 + 4 \text{ for }t \in [0,1]
 $$
 
 ``` r
 TT = 100
 t = seq(0, 1, length.out = TT)
 mu_X1 = -2*(t-0.5)^2 + 5
-mu_X2 = 3*(t-0.75)^3 + 0.1
+mu_X2 = 3*(t-0.75)^3 + 4
 ```
 
 ## Generate Eigenfunctions and Eigenscores
@@ -40,8 +57,10 @@ $$
 ``` r
 phi_X1 = matrix(0, nrow = TT, ncol = 3)
 phi_X1[,1] = sqrt(2/TT)*sin(pi*t)
-phi_X1[,2] = sqrt(2/TT)*sin(7*pi*t)
-phi_X1[,3] = sqrt(2/TT)*cos(7*pi*t)
+phi_X1[,2] = sqrt(2/TT)*sin(2*pi*t)
+phi_X1[,3] = sqrt(2/TT)*cos(4*pi*t)
+
+
 
 n = 99
 lambda11 = 40; lambda21 = 10; lambda31 = 1
@@ -49,6 +68,8 @@ xi_X1 = matrix(0, nrow = n, ncol = 3)
 xi_X1[,1] = rnorm(n, 0, lambda11)
 xi_X1[,2] = rnorm(n, 0, lambda21)
 xi_X1[,3] = rnorm(n, 0, lambda31)
+
+xi_X1 = normalizer(xi_X1)
 
 X1 = t(phi_X1 %*% t(xi_X1)) + rep(mu_X1, n) #TODO: Check this line; slightly different generation
 
@@ -61,21 +82,21 @@ phi_X1 %>%
   theme_bw()
 ```
 
-![](alternative_simulation_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
+![](alternative_simulation_files/figure-gfm/unnamed-chunk-143-1.png)<!-- -->
 
 ``` r
 
 plot(mu_X1)
 ```
 
-![](alternative_simulation_files/figure-gfm/unnamed-chunk-5-2.png)<!-- -->
+![](alternative_simulation_files/figure-gfm/unnamed-chunk-143-2.png)<!-- -->
 
 ``` r
 
 phi_X2 = matrix(0, nrow = TT, ncol = 3)
-phi_X2[,1] = sqrt(2/TT)*cos(5*pi*t)
+phi_X2[,1] = sqrt(2/TT)*cos(3*pi*t)
 phi_X2[,2] = sqrt(2/TT)*cos(pi*t)
-phi_X2[,3] = sqrt(2/TT)*sin(7*pi*t)
+phi_X2[,3] = sqrt(2/TT)*sin(5*pi*t)
 
 # lambda12 = 2; lambda22 = 20; lambda32 = 50
 # xi_X2 = matrix(0, nrow = n, ncol = 3)
@@ -94,14 +115,14 @@ phi_X2 %>%
   theme_bw()
 ```
 
-![](alternative_simulation_files/figure-gfm/unnamed-chunk-5-3.png)<!-- -->
+![](alternative_simulation_files/figure-gfm/unnamed-chunk-143-3.png)<!-- -->
 
 ``` r
 
 plot(mu_X2)
 ```
 
-![](alternative_simulation_files/figure-gfm/unnamed-chunk-5-4.png)<!-- -->
+![](alternative_simulation_files/figure-gfm/unnamed-chunk-143-4.png)<!-- -->
 
 ## Generate Response
 
@@ -110,7 +131,7 @@ $$
 $$
 
 $$
-\mu_{Y_2}(t) = -2\cdot 14^{(t-0.5)}
+\mu_{Y_2}(t) = 2\cdot 14^{(t-0.5)}
 $$
 
 $$
@@ -123,7 +144,7 @@ $$
 
 ``` r
 mu_Y1 = 6*exp(-(t-1)^2)
-mu_Y2 = -2*14^(t-0.5)
+mu_Y2 = 2*14^(t-0.5)
 
 phi_Y1 = matrix(0, nrow = TT, ncol = 3)
 phi_Y1[,1] = sqrt(2/TT)*cos(9*pi*t)
@@ -139,14 +160,14 @@ phi_Y1 %>%
   theme_bw()
 ```
 
-![](alternative_simulation_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
+![](alternative_simulation_files/figure-gfm/unnamed-chunk-144-1.png)<!-- -->
 
 ``` r
 
 plot(mu_Y1)
 ```
 
-![](alternative_simulation_files/figure-gfm/unnamed-chunk-6-2.png)<!-- -->
+![](alternative_simulation_files/figure-gfm/unnamed-chunk-144-2.png)<!-- -->
 
 ``` r
 
@@ -154,6 +175,8 @@ xi_Y1 = matrix(0, nrow = n, ncol = 3)
 xi_Y1[,1] = rnorm(n, 0, lambda11)
 xi_Y1[,2] = rnorm(n, 0, lambda21)
 xi_Y1[,3] = rnorm(n, 0, lambda31)
+
+xi_Y1 = normalizer(xi_Y1)
 
 
 phi_Y2 = matrix(0, nrow = TT, ncol = 3)
@@ -170,14 +193,14 @@ phi_Y2 %>%
   theme_bw()
 ```
 
-![](alternative_simulation_files/figure-gfm/unnamed-chunk-6-3.png)<!-- -->
+![](alternative_simulation_files/figure-gfm/unnamed-chunk-144-3.png)<!-- -->
 
 ``` r
 
 plot(mu_Y2)
 ```
 
-![](alternative_simulation_files/figure-gfm/unnamed-chunk-6-4.png)<!-- -->
+![](alternative_simulation_files/figure-gfm/unnamed-chunk-144-4.png)<!-- -->
 
 ``` r
 
@@ -211,14 +234,19 @@ n_eig_Y = 3
 
 ``` r
 # Generate B matrix from Unif(-U, U)
-U = 3
-B = matrix(sample(seq(-U, U, 0.01),n_eig_X*n_eig_Y),
+# U = 3
+# B = matrix(sample(seq(-U, U, 0.01),n_eig_X*n_eig_Y),
+#            nrow = n_eig_Y,
+#            ncol = n_eig_X)
+
+# sample(-9:9, 9, replace = T)
+B = matrix(c(-1, 2, 3, -1, -9, 3, 5, 5, -3),
            nrow = n_eig_Y,
            ncol = n_eig_X)
 
-epsilon = matrix(rnorm(n_eig_Y*n, mean = 0, sd = 0.01), 
-                 n_eig_Y, 
-                 n)
+# epsilon = matrix(rnorm(n_eig_Y*n, mean = 0, sd = 0.01), 
+#                  n_eig_Y, 
+#                  n)
 
 Y1 = matrix(nrow = n, 
             ncol = TT)
@@ -226,34 +254,37 @@ Y2 = matrix(nrow = n,
             ncol = TT)
 ```
 
-### Introduce Outliers
+### Introduce Outliers (DISCARDED FOR NOW)
 
 ``` r
-outliers = 20
-non_outliers = n - outliers
+# outliers = 20
+# non_outliers = n - outliers
+# 
 
-for (i in 1:non_outliers){
-  Y1[i,] = t(B%*%xi_X1[i,])%*%t(phi_Y1) + mu_Y1 + t(phi_Y1%*%epsilon[,i])
-  Y2[i,] = t(B%*%xi_X1[i,])%*%t(phi_Y2) + mu_Y2 + t(phi_Y2%*%epsilon[,i])
+# This is equal to xi_X1 %*% t(B) + mu_Y1
+
+for (i in 1:n){
+  Y1[i,] = t(B%*%xi_X1[i,])%*%t(phi_Y1) + mu_Y1 # + t(phi_Y1%*%epsilon[,i])
+  Y2[i,] = t(B%*%xi_X1[i,])%*%t(phi_Y2) + mu_Y2 # + t(phi_Y2%*%epsilon[,i])
 }
 ```
 
 ## Scenarios
 
 ``` r
-scenario = 1
-
-if (scenario==1){
-  outlier_var = 0.5
-  B_out = B + matrix(rnorm(n_eig_X*n_eig_Y, mean = 0, sd = outlier_var),
-                     nrow = n_eig_Y,
-                     ncol = n_eig_X)
-  
-  for (i in (non_outliers+1):n){
-    Y1[i,] = t(B_out%*%xi_X1[i,])%*%t(phi_Y1) + mu_Y1 + t(phi_Y1%*%epsilon[,i])
-    Y2[i,] = t(B_out%*%xi_X1[i,])%*%t(phi_Y2) + mu_Y2 + t(phi_Y2%*%epsilon[,i])
-  }
-}
+# scenario = 1
+# 
+# if (scenario==1){
+#   outlier_var = 0.5
+#   B_out = B + matrix(rnorm(n_eig_X*n_eig_Y, mean = 0, sd = outlier_var),
+#                      nrow = n_eig_Y,
+#                      ncol = n_eig_X)
+#   
+#   for (i in (non_outliers+1):n){
+#     Y1[i,] = t(B_out%*%xi_X1[i,])%*%t(phi_Y1) + mu_Y1 + t(phi_Y1%*%epsilon[,i])
+#     Y2[i,] = t(B_out%*%xi_X1[i,])%*%t(phi_Y2) + mu_Y2 + t(phi_Y2%*%epsilon[,i])
+#   }
+# }
 
 # if (scenario==2){
 #   gaittime = seq(0, 1, len=TT)
@@ -274,35 +305,34 @@ if (scenario==1){
 #     Y[i,] = t(cbind(phi_Y, out_basis/values[intu]) %*% (B_out %*% xi_X[i,]) + mu_Y) + t(phi_Y%*%epsilon[,i])
 #   }
 # }
-
-Y = cbind(Y1, Y2)
 ```
 
 ``` r
+Y = cbind(Y1, Y2)
+
 E = matrix(rnorm(2*TT*n, mean = 0, sd = sigma), n, 2*TT)
 
 Y =  Y + E
-X.all = X + E
 ```
 
 ``` r
 #### plot Predictior and Response curves ####
 
-matplot(t(X.all), 
+matplot(t(X), 
         type='l', 
         ylab='X(t)', 
         xlab='time', 
         main='Plot of predictor curves', 
         col=rgb(0,0,0,alpha=0.4))
-matlines(t(X.all[(non_outliers+1):n,]), 
-         type='l', 
-         lwd=3, 
-         lty=1)
 ```
 
-![](alternative_simulation_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
+![](alternative_simulation_files/figure-gfm/unnamed-chunk-151-1.png)<!-- -->
 
 ``` r
+# matlines(t(X[(non_outliers+1):n,]), 
+#          type='l', 
+#          lwd=3, 
+#          lty=1)
 
 matplot(t(Y), 
         type='l', 
@@ -310,19 +340,22 @@ matplot(t(Y),
         xlab='time', 
         main='Plot of response curves', 
         col=rgb(0,0,0,alpha=0.6))
-matlines(t(Y[(non_outliers+1):n,]), 
-         type='l', 
-         lwd=3, 
-         lty=1)
 ```
 
-![](alternative_simulation_files/figure-gfm/unnamed-chunk-13-2.png)<!-- -->
+![](alternative_simulation_files/figure-gfm/unnamed-chunk-151-2.png)<!-- -->
+
+``` r
+# matlines(t(Y[(non_outliers+1):n,]), 
+#          type='l', 
+#          lwd=3, 
+#          lty=1)
+```
 
 ### MFPCA
 
 ``` r
-X_miss = irregMFPCA::missing_data_simulator(n_obs = 40,
-                                            dat = X.all,
+X_miss = irregMFPCA::missing_data_simulator(n_obs = 90,
+                                            dat = X,
                                             t = seq(0, 1, length.out = TT),
                                             seed = 16)
 
@@ -341,7 +374,7 @@ res1 = FPCA(df$Component1,
                  kernel='epan',
                  verbose=TRUE))
 #> No binning is needed!
-#> At most 27 number of PC can be selected, thresholded by `maxK` = 20.
+#> At most 33 number of PC can be selected, thresholded by `maxK` = 20.
 
 res2 = FPCA(df$Component2,
             df$Time,
@@ -350,7 +383,7 @@ res2 = FPCA(df$Component2,
                  kernel='epan',
                  verbose=TRUE))
 #> No binning is needed!
-#> At most 34 number of PC can be selected, thresholded by `maxK` = 20.
+#> At most 42 number of PC can be selected, thresholded by `maxK` = 20.
 ```
 
 ``` r
@@ -372,7 +405,7 @@ hat %>%
   theme_bw()
 ```
 
-![](alternative_simulation_files/figure-gfm/unnamed-chunk-17-1.png)<!-- -->
+![](alternative_simulation_files/figure-gfm/unnamed-chunk-155-1.png)<!-- -->
 
 ``` r
 
@@ -386,7 +419,7 @@ res1$phi[, 1:3] %>%
   theme_bw()
 ```
 
-![](alternative_simulation_files/figure-gfm/unnamed-chunk-17-2.png)<!-- -->
+![](alternative_simulation_files/figure-gfm/unnamed-chunk-155-2.png)<!-- -->
 
 ``` r
 
@@ -398,7 +431,7 @@ res1$phi[, 1:3] %>%
   theme_bw()
 ```
 
-![](alternative_simulation_files/figure-gfm/unnamed-chunk-17-3.png)<!-- -->
+![](alternative_simulation_files/figure-gfm/unnamed-chunk-155-3.png)<!-- -->
 
 ``` r
 
@@ -410,7 +443,7 @@ res1$phi[, 1:3] %>%
   theme_bw()
 ```
 
-![](alternative_simulation_files/figure-gfm/unnamed-chunk-17-4.png)<!-- -->
+![](alternative_simulation_files/figure-gfm/unnamed-chunk-155-4.png)<!-- -->
 
 ### Compare to Actual: Second Component
 
@@ -422,7 +455,7 @@ hat %>%
   theme_bw()
 ```
 
-![](alternative_simulation_files/figure-gfm/unnamed-chunk-18-1.png)<!-- -->
+![](alternative_simulation_files/figure-gfm/unnamed-chunk-156-1.png)<!-- -->
 
 ``` r
 
@@ -436,7 +469,7 @@ res2$phi[, 1:3] %>%
   theme_bw()
 ```
 
-![](alternative_simulation_files/figure-gfm/unnamed-chunk-18-2.png)<!-- -->
+![](alternative_simulation_files/figure-gfm/unnamed-chunk-156-2.png)<!-- -->
 
 ``` r
 
@@ -448,7 +481,7 @@ res2$phi[, 1:3] %>%
   theme_bw()
 ```
 
-![](alternative_simulation_files/figure-gfm/unnamed-chunk-18-3.png)<!-- -->
+![](alternative_simulation_files/figure-gfm/unnamed-chunk-156-3.png)<!-- -->
 
 ``` r
 
@@ -460,13 +493,13 @@ res2$phi[, 1:3] %>%
   theme_bw()
 ```
 
-![](alternative_simulation_files/figure-gfm/unnamed-chunk-18-4.png)<!-- -->
+![](alternative_simulation_files/figure-gfm/unnamed-chunk-156-4.png)<!-- -->
 
 ## Irregular MFPCA
 
 ``` r
-mfpca_res = irregMFPCA::irregMFPCA(components = 2,
-                                   split = F,
+mfpca_res = irregMFPCA::irregMFPCA(components = 3, #TODO: Ambiguous parameter name. Number of principal components to consider
+                                   split = T,
                                    res1,
                                    res2)
 ```
@@ -475,79 +508,184 @@ mfpca_res = irregMFPCA::irregMFPCA(components = 2,
 
 ``` r
 mfpca_eigenf = mfpca_res$unstackpsi
-colnames(mfpca_eigenf) = c("component_1_1", "component_1_2", "component_2_1", "component_2_2")
+colnames(mfpca_eigenf) = c("var_1_1", "var_1_2", "var_1_3", "var_2_1", "var_2_2", "var_2_3")
 mfpca_eigens = mfpca_res$rho
-colnames(mfpca_eigens) = c("function_1", "function_2")
+colnames(mfpca_eigens) = c("function_1", "function_2", "function_3")
 ```
 
 ``` r
-t = seq(0, 1, length.out = 51)
+tplot = seq(0, 1, length.out = 51)
 mfpca_eigenf %>%
   as.data.frame() %>%
   ggplot() +
-  geom_line(aes(x = t, y = component_1_1), col = "red", linetype = "dotted") +
-  geom_line(data = phi_X1_df, aes(x = seq(0, 1, length.out = 100), y =V1), col = "black") +
+  geom_line(aes(x = tplot, y = var_1_1), col = "red") +
+  geom_line(data = phi_X1_df, aes(x = seq(0, 1, length.out = 100), y =V1), col = "black", linetype = "dotted") +
   theme_bw()
 ```
 
-![](alternative_simulation_files/figure-gfm/unnamed-chunk-21-1.png)<!-- -->
-
-``` r
-
-mfpca_eigenf %>%
-  as.data.frame() %>%
-  ggplot() +
-  geom_line(aes(x = t, y = component_1_2), col = "red", linetype = "dotted") +
-  geom_line(data = phi_X1_df, aes(x = seq(0, 1, length.out = 100), y =V2), col = "black") +
-  theme_bw()
-```
-
-![](alternative_simulation_files/figure-gfm/unnamed-chunk-21-2.png)<!-- -->
-
-``` r
-
-
-mfpca_eigenf %>%
-  as.data.frame() %>%
-  ggplot() +
-  geom_line(aes(x = t, y = component_2_1), col = "blue", linetype = "dotted") +
-  geom_line(data = phi_X2_df, aes(x = seq(0, 1, length.out = 100), y =V1), col = "black") +
-  theme_bw()
-```
-
-![](alternative_simulation_files/figure-gfm/unnamed-chunk-21-3.png)<!-- -->
+![](alternative_simulation_files/figure-gfm/unnamed-chunk-159-1.png)<!-- -->
 
 ``` r
 
 mfpca_eigenf %>%
   as.data.frame() %>%
   ggplot() +
-  geom_line(aes(x = t, y = component_2_2), col = "blue", linetype = "dotted") +
-  geom_line(data = phi_X2_df, aes(x = seq(0, 1, length.out = 100), y =V2), col = "black") +
+  geom_line(aes(x = tplot, y = var_1_2), col = "red") +
+  geom_line(data = phi_X1_df, aes(x = seq(0, 1, length.out = 100), y =V2), col = "black", linetype = "dotted") +
   theme_bw()
 ```
 
-![](alternative_simulation_files/figure-gfm/unnamed-chunk-21-4.png)<!-- -->
-
-``` r
-mfpca_eigens %>%
-  as.data.frame() %>%
-  ggplot()+
-  geom_line(aes(x = seq(1, 99), y = function_1), col = "red", linetype = "dotted") +
-  geom_line(data = as.data.frame(xi_X1), aes(x = seq(1, 99), y = V1), col = "black") +
-  theme_bw()
-```
-
-![](alternative_simulation_files/figure-gfm/unnamed-chunk-22-1.png)<!-- -->
+![](alternative_simulation_files/figure-gfm/unnamed-chunk-159-2.png)<!-- -->
 
 ``` r
 
-mfpca_eigens %>%
+mfpca_eigenf %>%
   as.data.frame() %>%
-  ggplot()+
-  geom_line(aes(x = seq(1, 99), y = function_2), col = "red", linetype = "dotted") +
-  geom_line(data = as.data.frame(xi_X1), aes(x = seq(1, 99), y = V2), col = "black") +
+  ggplot() +
+  geom_line(aes(x = tplot, y = var_1_3), col = "red") +
+  geom_line(data = phi_X1_df, aes(x = seq(0, 1, length.out = 100), y =V3), col = "black", linetype = "dotted") +
   theme_bw()
 ```
 
-![](alternative_simulation_files/figure-gfm/unnamed-chunk-22-2.png)<!-- -->
+![](alternative_simulation_files/figure-gfm/unnamed-chunk-159-3.png)<!-- -->
+
+``` r
+
+
+mfpca_eigenf %>%
+  as.data.frame() %>%
+  ggplot() +
+  geom_line(aes(x = tplot, y = var_2_1), col = "blue") +
+  geom_line(data = phi_X2_df, aes(x = seq(0, 1, length.out = 100), y =V1), col = "black", linetype = "dotted") +
+  theme_bw()
+```
+
+![](alternative_simulation_files/figure-gfm/unnamed-chunk-159-4.png)<!-- -->
+
+``` r
+
+mfpca_eigenf %>%
+  as.data.frame() %>%
+  ggplot() +
+  geom_line(aes(x = tplot, y = var_2_2), col = "blue") +
+  geom_line(data = phi_X2_df, aes(x = seq(0, 1, length.out = 100), y =V2), col = "black", linetype = "dotted") +
+  theme_bw()
+```
+
+![](alternative_simulation_files/figure-gfm/unnamed-chunk-159-5.png)<!-- -->
+
+``` r
+
+mfpca_eigenf %>%
+  as.data.frame() %>%
+  ggplot() +
+  geom_line(aes(x = tplot, y = var_2_3), col = "blue") +
+  geom_line(data = phi_X2_df, aes(x = seq(0, 1, length.out = 100), y =V3), col = "black", linetype = "dotted") +
+  theme_bw()
+```
+
+![](alternative_simulation_files/figure-gfm/unnamed-chunk-159-6.png)<!-- -->
+
+``` r
+eigens = data.frame(est1 = -mfpca_eigens[,1],
+                    est2 = -mfpca_eigens[,2],
+                    est3 = -mfpca_eigens[,3],
+                    act1 = xi_X1[, 1],
+                    act2 = xi_X1[, 2],
+                    act3 = xi_X1[, 3])
+
+eigens %>%
+  ggplot(aes(x = est1, y = act1)) +
+  geom_point() +
+  geom_abline(intercept = 0, slope = 1, col = "red") +
+  geom_smooth(method = "lm", se = F) +
+  theme_bw()
+#> `geom_smooth()` using formula = 'y ~ x'
+```
+
+![](alternative_simulation_files/figure-gfm/unnamed-chunk-160-1.png)<!-- -->
+
+``` r
+
+eigens %>%
+  ggplot(aes(x = est2, y = act2)) +
+  geom_point() +
+  geom_abline(intercept = 0, slope = 1, col = "red") +
+  geom_smooth(method = "lm", se = F) +
+  theme_bw()
+#> `geom_smooth()` using formula = 'y ~ x'
+```
+
+![](alternative_simulation_files/figure-gfm/unnamed-chunk-160-2.png)<!-- -->
+
+``` r
+
+eigens %>%
+  ggplot(aes(x = est3, y = act3)) +
+  geom_point() +
+  geom_abline(intercept = 0, slope = 1, col = "red") +
+  geom_smooth(method = "lm", se = F) +
+  theme_bw()
+#> `geom_smooth()` using formula = 'y ~ x'
+```
+
+![](alternative_simulation_files/figure-gfm/unnamed-chunk-160-3.png)<!-- -->
+
+## Prepare for Regression
+
+### MFPCA for Y
+
+``` r
+Y_miss = irregMFPCA::missing_data_simulator(n_obs = 90,
+                                            dat = Y,
+                                            t = seq(0, 1, length.out = TT),
+                                            seed = 16)
+df_y = Y_miss %>% tibble_format(tindex = seq(0, 1, length.out = 100)) %>% fpca_format()
+#> New names:
+#> • `v` -> `v...3`
+#> • `v` -> `v...4`
+
+res1_y = FPCA(df_y$Component1,
+            df_y$Time,
+            list(dataType='Sparse',
+                 error=FALSE,
+                 kernel='epan',
+                 verbose=TRUE))
+#> No binning is needed!
+#> 
+#> At most 33 number of PC can be selected, thresholded by `maxK` = 20.
+
+res2_y = FPCA(df_y$Component2,
+            df_y$Time,
+            list(dataType='Sparse',
+                 error=FALSE,
+                 kernel='epan',
+                 verbose=TRUE))
+#> No binning is needed!
+#> 
+#> At most 30 number of PC can be selected, thresholded by `maxK` = 20.
+
+mfpca_resy = irregMFPCA::irregMFPCA(components = 3,
+                                    split = F,
+                                    res1_y,
+                                    res2_y)
+```
+
+### Multivariate Multiple Regression
+
+``` r
+response = mfpca_resy$rho
+predictor = mfpca_res$rho
+
+mod = lm(response ~ -1 + predictor)
+
+t(B); mod$coefficients
+#>      [,1] [,2] [,3]
+#> [1,]   -1    2    3
+#> [2,]   -1   -9    3
+#> [3,]    5    5   -3
+#>                  [,1]      [,2]       [,3]
+#> predictor1  3.2687857 0.9662565 -0.1472880
+#> predictor2 -0.8843049 0.6955129  0.2329837
+#> predictor3 -4.2509699 2.9185976  0.1347292
+```
