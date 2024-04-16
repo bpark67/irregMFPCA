@@ -70,15 +70,22 @@ $$
 $$
 
 ```{r}
+# phi_X1 = matrix(0, nrow = TT, ncol = 3)
+# phi_X1[,1] = sqrt(2/TT)*sin(pi*t)
+# phi_X1[,2] = sqrt(2/TT)*sin(2*pi*t)
+# phi_X1[,3] = sqrt(2/TT)*cos(4*pi*t)
+
 phi_X1 = matrix(0, nrow = TT, ncol = 3)
-phi_X1[,1] = sqrt(2/TT)*sin(pi*t)
-phi_X1[,2] = sqrt(2/TT)*sin(2*pi*t)
-phi_X1[,3] = sqrt(2/TT)*cos(4*pi*t)
+phi_X1[,1] = sin(pi*t)
+phi_X1[,2] = sin(2*pi*t)
+phi_X1[,3] = cos(4*pi*t)
 
+# new_phi_X1 = normalizer(new_phi_X1)
 
+phi_X1 = normalizer(phi_X1)
 
-n = 99
-lambda11 = 40; lambda21 = 10; lambda31 = 1
+n = 99;
+lambda11 = 4; lambda21 = 1; lambda31 = .1
 xi_X1 = matrix(0, nrow = n, ncol = 3)
 xi_X1[,1] = rnorm(n, 0, lambda11)
 xi_X1[,2] = rnorm(n, 0, lambda21)
@@ -86,7 +93,7 @@ xi_X1[,3] = rnorm(n, 0, lambda31)
 
 xi_X1 = normalizer(xi_X1)
 
-X1 = t(phi_X1 %*% t(xi_X1)) + rep(mu_X1, n) #TODO: Check this line; slightly different generation
+X1 = t(phi_X1 %*% t(xi_X1)) + rep(1, n) %*% t(mu_X1)
 
 phi_X1 %>%
   as.data.frame() %>%
@@ -99,9 +106,11 @@ phi_X1 %>%
 plot(mu_X1)
 
 phi_X2 = matrix(0, nrow = TT, ncol = 3)
-phi_X2[,1] = sqrt(2/TT)*cos(3*pi*t)
-phi_X2[,2] = sqrt(2/TT)*cos(pi*t)
-phi_X2[,3] = sqrt(2/TT)*sin(5*pi*t)
+phi_X2[,1] = cos(3*pi*t)
+phi_X2[,2] = cos(pi*t)
+phi_X2[,3] = sin(5*pi*t)
+
+phi_X2 = normalizer(phi_X2)
 
 # lambda12 = 2; lambda22 = 20; lambda32 = 50
 # xi_X2 = matrix(0, nrow = n, ncol = 3)
@@ -109,7 +118,7 @@ phi_X2[,3] = sqrt(2/TT)*sin(5*pi*t)
 # xi_X2[,2] = rnorm(n, 0, lambda22)
 # xi_X2[,3] = rnorm(n, 0, lambda32)
 
-X2 = t(phi_X2 %*% t(xi_X1)) + rep(mu_X2, n)
+X2 = t(phi_X2 %*% t(xi_X1)) + rep(1, n) %*% t(mu_X2)
 
 phi_X2 %>%
   as.data.frame() %>%
@@ -121,6 +130,13 @@ phi_X2 %>%
 
 plot(mu_X2)
 ```
+
+```{r}
+# V = normalizer(phi_X1)
+# 
+# t(V) %*% V / 100
+```
+
 
 
 ## Generate Response
@@ -151,6 +167,8 @@ phi_Y1[,1] = sqrt(2/TT)*cos(9*pi*t)
 phi_Y1[,2] = sqrt(2/TT)*sin(5*pi*t)
 phi_Y1[,3] = sqrt(2/TT)*cos(2*pi*t)
 
+phi_Y1 = normalizer(phi_Y1)
+
 phi_Y1 %>%
   as.data.frame() %>%
   ggplot(aes(x = t)) +
@@ -173,6 +191,8 @@ phi_Y2 = matrix(0, nrow = TT, ncol = 3)
 phi_Y2[,1] = sqrt(2/TT)*sin(3*pi*t)
 phi_Y2[,2] = sqrt(2/TT)*cos(pi*t)
 phi_Y2[,3] = sqrt(2/TT)*sin(7*pi*t)
+
+phi_Y2 = normalizer(phi_Y2)
 
 phi_Y2 %>%
   as.data.frame() %>%
