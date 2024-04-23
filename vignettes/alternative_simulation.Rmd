@@ -48,7 +48,7 @@ $$
 $$
 
 $$
-\mu_{X_2}(t) = 3(t-0.75)^3 + 4 \text{ for }t \in [0,1]
+\mu_{X_2}(t) = 3(t-0.75)^3 -5 \text{ for }t \in [0,1]
 $$
 
 
@@ -56,7 +56,7 @@ $$
 TT = 100
 t = seq(0, 1, length.out = TT)
 mu_X1 = -2*(t-0.5)^2 + 5
-mu_X2 = 3*(t-0.75)^3 + 4
+mu_X2 = 3*(t-0.75)^3 - 5
 ```
 
 ## Generate Eigenfunctions and Eigenscores
@@ -70,30 +70,42 @@ $$
 $$
 
 ```{r}
-# phi_X1 = matrix(0, nrow = TT, ncol = 3)
-# phi_X1[,1] = sqrt(2/TT)*sin(pi*t)
-# phi_X1[,2] = sqrt(2/TT)*sin(2*pi*t)
-# phi_X1[,3] = sqrt(2/TT)*cos(4*pi*t)
+n = 199;
+lambda11 = 5; lambda21 = 3; lambda31 = 1
+xi_X = matrix(0, nrow = n, ncol = 3)
+xi_X[,1] = rnorm(n, 0, lambda11)
+xi_X[,2] = rnorm(n, 0, lambda21)
+xi_X[,3] = rnorm(n, 0, lambda31)
+
+xi_X = normalizer(xi_X)
 
 phi_X1 = matrix(0, nrow = TT, ncol = 3)
 phi_X1[,1] = sin(pi*t)
 phi_X1[,2] = sin(2*pi*t)
 phi_X1[,3] = cos(4*pi*t)
 
-# new_phi_X1 = normalizer(new_phi_X1)
+phi_X2 = matrix(0, nrow = TT, ncol = 3)
+phi_X2[,1] = cos(3*pi*t)
+phi_X2[,2] = cos(pi*t)
+phi_X2[,3] = sin(5*pi*t)
 
-phi_X1 = normalizer(phi_X1)
+phi = rbind(phi_X1, phi_X2) %>% normalizer(normal = TT/2)
 
-n = 99;
-lambda11 = 4; lambda21 = 1; lambda31 = .1
-xi_X1 = matrix(0, nrow = n, ncol = 3)
-xi_X1[,1] = rnorm(n, 0, lambda11)
-xi_X1[,2] = rnorm(n, 0, lambda21)
-xi_X1[,3] = rnorm(n, 0, lambda31)
+## Check for orthogonality
 
-xi_X1 = normalizer(xi_X1)
+tol = 1e-1
+check = 1/TT*t(phi) %*% phi
+if(check[1, 2] > tol | check[1, 2] < -tol){
+  cat("The pair of functions were not orthogonal. \nPlease choose a different pair.\n")
+}
 
-X1 = t(phi_X1 %*% t(xi_X1)) + rep(1, n) %*% t(mu_X1)
+## Resplit into phi_X1 and phi_X2
+phi_X1 = phi[1:TT,]
+phi_X2 = phi[(TT+1):(2*TT),]
+
+
+X1 = t(phi_X1 %*% t(xi_X)) + rep(1, n) %*% t(mu_X1)
+X2 = t(phi_X2 %*% t(xi_X)) + rep(1, n) %*% t(mu_X2)
 
 phi_X1 %>%
   as.data.frame() %>%
@@ -105,20 +117,6 @@ phi_X1 %>%
 
 plot(mu_X1)
 
-phi_X2 = matrix(0, nrow = TT, ncol = 3)
-phi_X2[,1] = cos(3*pi*t)
-phi_X2[,2] = cos(pi*t)
-phi_X2[,3] = sin(5*pi*t)
-
-phi_X2 = normalizer(phi_X2)
-
-# lambda12 = 2; lambda22 = 20; lambda32 = 50
-# xi_X2 = matrix(0, nrow = n, ncol = 3)
-# xi_X2[,1] = rnorm(n, 0, lambda12)
-# xi_X2[,2] = rnorm(n, 0, lambda22)
-# xi_X2[,3] = rnorm(n, 0, lambda32)
-
-X2 = t(phi_X2 %*% t(xi_X1)) + rep(1, n) %*% t(mu_X2)
 
 phi_X2 %>%
   as.data.frame() %>%
@@ -146,7 +144,7 @@ $$
 $$
 
 $$
-\mu_{Y_2}(t) = 2\cdot 14^{(t-0.5)}
+\mu_{Y_2}(t) = -2\cdot 14^{(t-0.5)}
 $$
 
 $$
@@ -160,14 +158,22 @@ $$
 
 ```{r}
 mu_Y1 = 6*exp(-(t-1)^2)
-mu_Y2 = 2*14^(t-0.5)
+mu_Y2 = -2*14^(t-0.5)
 
 phi_Y1 = matrix(0, nrow = TT, ncol = 3)
 phi_Y1[,1] = sqrt(2/TT)*cos(9*pi*t)
 phi_Y1[,2] = sqrt(2/TT)*sin(5*pi*t)
 phi_Y1[,3] = sqrt(2/TT)*cos(2*pi*t)
 
-phi_Y1 = normalizer(phi_Y1)
+phi_Y2 = matrix(0, nrow = TT, ncol = 3)
+phi_Y2[,1] = sqrt(2/TT)*sin(3*pi*t)
+phi_Y2[,2] = sqrt(2/TT)*cos(pi*t)
+phi_Y2[,3] = sqrt(2/TT)*sin(7*pi*t)
+
+phi = rbind(phi_Y1, phi_Y2) %>% normalizer(normal = TT/2)
+
+phi_Y1 = phi[1:TT,]
+phi_Y2 = phi[(TT+1):(2*TT),]
 
 phi_Y1 %>%
   as.data.frame() %>%
@@ -179,21 +185,6 @@ phi_Y1 %>%
 
 plot(mu_Y1)
 
-xi_Y1 = matrix(0, nrow = n, ncol = 3)
-xi_Y1[,1] = rnorm(n, 0, lambda11)
-xi_Y1[,2] = rnorm(n, 0, lambda21)
-xi_Y1[,3] = rnorm(n, 0, lambda31)
-
-xi_Y1 = normalizer(xi_Y1)
-
-
-phi_Y2 = matrix(0, nrow = TT, ncol = 3)
-phi_Y2[,1] = sqrt(2/TT)*sin(3*pi*t)
-phi_Y2[,2] = sqrt(2/TT)*cos(pi*t)
-phi_Y2[,3] = sqrt(2/TT)*sin(7*pi*t)
-
-phi_Y2 = normalizer(phi_Y2)
-
 phi_Y2 %>%
   as.data.frame() %>%
   ggplot(aes(x = t)) +
@@ -203,11 +194,6 @@ phi_Y2 %>%
   theme_bw()
 
 plot(mu_Y2)
-
-# xi_Y2 = matrix(0, nrow = n, ncol = 3)
-# xi_Y2[,1] = rnorm(n, 0, lambda12)
-# xi_Y2[,2] = rnorm(n, 0, lambda22)
-# xi_Y2[,3] = rnorm(n, 0, lambda32)
 ```
 
 ## Combine Components
@@ -226,7 +212,7 @@ mu_Y = c(mu_Y1, mu_Y2)
 ## Noise
 
 ```{r}
-sigma = 0.1
+sigma = 0.001
 n_eig_X = 3
 n_eig_Y = 3
 ```
@@ -265,8 +251,8 @@ Y2 = matrix(nrow = n,
 # This is equal to xi_X1 %*% t(B) + mu_Y1
 
 for (i in 1:n){
-  Y1[i,] = t(B%*%xi_X1[i,])%*%t(phi_Y1) + mu_Y1 # + t(phi_Y1%*%epsilon[,i])
-  Y2[i,] = t(B%*%xi_X1[i,])%*%t(phi_Y2) + mu_Y2 # + t(phi_Y2%*%epsilon[,i])
+  Y1[i,] = t(B%*%xi_X[i,])%*%t(phi_Y1) + mu_Y1 # + t(phi_Y1%*%epsilon[,i])
+  Y2[i,] = t(B%*%xi_X[i,])%*%t(phi_Y2) + mu_Y2 # + t(phi_Y2%*%epsilon[,i])
 }
 ```
 
@@ -351,7 +337,7 @@ matplot(t(Y),
 ### MFPCA
 
 ```{r}
-X_miss = irregMFPCA::missing_data_simulator(n_obs = 90,
+X_miss = irregMFPCA::missing_data_simulator(n_obs = 99,
                                             dat = X,
                                             t = seq(0, 1, length.out = TT),
                                             seed = 16)
@@ -391,7 +377,7 @@ hat = data.frame(hat1 = res1$mu,
 hat %>%
   ggplot() +
   geom_line(aes(x = 1:51, y = hat1)) +
-  geom_line(data = act, aes(x = seq(1, 51, length.out = 100), y = act1), linetype = "dashed") +
+  geom_line(data = act, aes(x = seq(1, 51, length.out = TT), y = act1), linetype = "dashed") +
   theme_bw()
 
 phi_X1_df = phi_X1 %>% as.data.frame()
@@ -400,21 +386,21 @@ res1$phi[, 1:3] %>%
   as.data.frame() %>%
   ggplot() +
   geom_line(aes(x = 1:51, y = V1), col = "red") +
-  geom_line(data = phi_X1_df, aes(x = seq(1, 51, length.out = 100), y = V1), col = "red", linetype = "dashed") +
+  geom_line(data = phi_X1_df, aes(x = seq(1, 51, length.out = TT), y = V1), col = "red", linetype = "dashed") +
   theme_bw()
 
 res1$phi[, 1:3] %>%
   as.data.frame() %>%
   ggplot() +
   geom_line(aes(x = 1:51, y = V2), col = "blue") +
-  geom_line(data = phi_X1_df, aes(x = seq(1, 51, length.out = 100), y = V2), col = "blue", linetype = "dashed") +
+  geom_line(data = phi_X1_df, aes(x = seq(1, 51, length.out = TT), y = V2), col = "blue", linetype = "dashed") +
   theme_bw()
 
 res1$phi[, 1:3] %>%
   as.data.frame() %>%
   ggplot() +
   geom_line(aes(x = 1:51, y = V3), col = "green") +
-  geom_line(data = phi_X1_df, aes(x = seq(1, 51, length.out = 100), y = V3), col = "green", linetype = "dashed") +
+  geom_line(data = phi_X1_df, aes(x = seq(1, 51, length.out = TT), y = V3), col = "green", linetype = "dashed") +
   theme_bw()
 
 ```
@@ -426,7 +412,7 @@ res1$phi[, 1:3] %>%
 hat %>%
   ggplot() +
   geom_line(aes(x = 1:51, y = hat2)) +
-  geom_line(data = act, aes(x = seq(1, 51, length.out = 100), y = act2), linetype = "dashed") +
+  geom_line(data = act, aes(x = seq(1, 51, length.out = TT), y = act2), linetype = "dashed") +
   theme_bw()
 
 phi_X2_df = phi_X2 %>% as.data.frame()
@@ -435,21 +421,21 @@ res2$phi[, 1:3] %>%
   as.data.frame() %>%
   ggplot() +
   geom_line(aes(x = 1:51, y = V1), col = "red") +
-  geom_line(data = phi_X2_df, aes(x = seq(1, 51, length.out = 100), y = V1), col = "red", linetype = "dashed") +
+  geom_line(data = phi_X2_df, aes(x = seq(1, 51, length.out = TT), y = V1), col = "red", linetype = "dashed") +
   theme_bw()
 
 res2$phi[, 1:3] %>%
   as.data.frame() %>%
   ggplot() +
   geom_line(aes(x = 1:51, y = V2), col = "blue") +
-  geom_line(data = phi_X2_df, aes(x = seq(1, 51, length.out = 100), y = V2), col = "blue", linetype = "dashed") +
+  geom_line(data = phi_X2_df, aes(x = seq(1, 51, length.out = TT), y = V2), col = "blue", linetype = "dashed") +
   theme_bw()
 
 res2$phi[, 1:3] %>%
   as.data.frame() %>%
   ggplot() +
   geom_line(aes(x = 1:51, y = V3), col = "green") +
-  geom_line(data = phi_X2_df, aes(x = seq(1, 51, length.out = 100), y = V3), col = "green", linetype = "dashed") +
+  geom_line(data = phi_X2_df, aes(x = seq(1, 51, length.out = TT), y = V3), col = "green", linetype = "dashed") +
   theme_bw()
 ```
 
@@ -523,9 +509,9 @@ mfpca_eigenf %>%
 eigens = data.frame(est1 = -mfpca_eigens[,1],
                     est2 = -mfpca_eigens[,2],
                     est3 = -mfpca_eigens[,3],
-                    act1 = xi_X1[, 1],
-                    act2 = xi_X1[, 2],
-                    act3 = xi_X1[, 3])
+                    act1 = xi_X[, 1],
+                    act2 = xi_X[, 2],
+                    act3 = xi_X[, 3])
 
 eigens %>%
   ggplot(aes(x = est1, y = act1)) +
@@ -556,11 +542,11 @@ eigens %>%
 ### MFPCA for Y
 
 ```{r}
-Y_miss = irregMFPCA::missing_data_simulator(n_obs = 90,
+Y_miss = irregMFPCA::missing_data_simulator(n_obs = 99,
                                             dat = Y,
                                             t = seq(0, 1, length.out = TT),
                                             seed = 16)
-df_y = Y_miss %>% tibble_format(tindex = seq(0, 1, length.out = 100)) %>% fpca_format()
+df_y = Y_miss %>% tibble_format(tindex = seq(0, 1, length.out = TT)) %>% fpca_format()
 
 res1_y = FPCA(df_y$Component1,
             df_y$Time,
