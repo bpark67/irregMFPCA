@@ -250,10 +250,13 @@ Y2 = matrix(nrow = n,
 
 # This is equal to xi_X1 %*% t(B) + mu_Y1
 
-for (i in 1:n){
-  Y1[i,] = t(B%*%xi_X[i,])%*%t(phi_Y1) + mu_Y1 # + t(phi_Y1%*%epsilon[,i])
-  Y2[i,] = t(B%*%xi_X[i,])%*%t(phi_Y2) + mu_Y2 # + t(phi_Y2%*%epsilon[,i])
-}
+# for (i in 1:n){
+#   Y1[i,] = t(B%*%xi_X[i,])%*%t(phi_Y1) + mu_Y1 # + t(phi_Y1%*%epsilon[,i])
+#   Y2[i,] = t(B%*%xi_X[i,])%*%t(phi_Y2) + mu_Y2 # + t(phi_Y2%*%epsilon[,i])
+# }
+
+Y1 = t(phi_Y1 %*% t(xi_X %*% B)) + rep(1, n) %*% t(mu_Y1)
+Y2 = t(phi_Y2 %*% t(xi_X %*% B)) + rep(1, n) %*% t(mu_Y2)
 ```
 
 
@@ -576,7 +579,7 @@ predictor = mfpca_res$rho
 
 mod = lm(response ~ -1 + predictor)
 
-t(B); mod$coefficients
+B; mod$coefficients
 ```
 
 
