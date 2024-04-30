@@ -4,58 +4,10 @@ alternative_simulation
 ``` r
 library(irregMFPCA)
 library(tidyverse)
-#> ── Attaching core tidyverse packages ───────────────────────────────────────────────────────── tidyverse 2.0.0 ──
-#> ✔ dplyr     1.1.4     ✔ readr     2.1.5
-#> ✔ forcats   1.0.0     ✔ stringr   1.5.1
-#> ✔ ggplot2   3.4.4     ✔ tibble    3.2.1
-#> ✔ lubridate 1.9.3     ✔ tidyr     1.3.0
-#> ✔ purrr     1.0.2     
-#> ── Conflicts ─────────────────────────────────────────────────────────────────────────── tidyverse_conflicts() ──
-#> ✖ dplyr::filter() masks stats::filter()
-#> ✖ dplyr::lag()    masks stats::lag()
-#> ℹ Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
 library(fda)
-#> Loading required package: splines
-#> Loading required package: fds
-#> Loading required package: rainbow
-#> Loading required package: MASS
-#> 
-#> Attaching package: 'MASS'
-#> 
-#> The following object is masked from 'package:dplyr':
-#> 
-#>     select
-#> 
-#> Loading required package: pcaPP
-#> Loading required package: RCurl
-#> 
-#> Attaching package: 'RCurl'
-#> 
-#> The following object is masked from 'package:tidyr':
-#> 
-#>     complete
-#> 
-#> Loading required package: deSolve
-#> 
-#> Attaching package: 'fda'
-#> 
-#> The following object is masked from 'package:graphics':
-#> 
-#>     matplot
 library(fdapace)
 library(MFPCA)
-#> Loading required package: funData
-#> 
-#> Attaching package: 'funData'
-#> 
-#> The following object is masked from 'package:ggplot2':
-#> 
-#>     ggplot
-#> 
-#> The following object is masked from 'package:stats':
-#> 
-#>     integrate
-set.seed(16)
+set.seed(17)
 ```
 
 ## Function to Normalize Eigenscores
@@ -151,14 +103,14 @@ phi_X %>%
   theme_bw()
 ```
 
-![](alternative_simulation_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
+![](alternative_simulation_files/figure-gfm/unnamed-chunk-41-1.png)<!-- -->
 
 ``` r
 
 plot(mu_X1)
 ```
 
-![](alternative_simulation_files/figure-gfm/unnamed-chunk-4-2.png)<!-- -->
+![](alternative_simulation_files/figure-gfm/unnamed-chunk-41-2.png)<!-- -->
 
 ``` r
 
@@ -166,7 +118,7 @@ plot(mu_X1)
 plot(mu_X2)
 ```
 
-![](alternative_simulation_files/figure-gfm/unnamed-chunk-4-3.png)<!-- -->
+![](alternative_simulation_files/figure-gfm/unnamed-chunk-41-3.png)<!-- -->
 
 ``` r
 # V = normalizer(phi_X1)
@@ -225,14 +177,14 @@ phi_Y %>%
   theme_bw()
 ```
 
-![](alternative_simulation_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
+![](alternative_simulation_files/figure-gfm/unnamed-chunk-43-1.png)<!-- -->
 
 ``` r
 
 plot(mu_Y1)
 ```
 
-![](alternative_simulation_files/figure-gfm/unnamed-chunk-6-2.png)<!-- -->
+![](alternative_simulation_files/figure-gfm/unnamed-chunk-43-2.png)<!-- -->
 
 ``` r
 
@@ -247,7 +199,7 @@ plot(mu_Y1)
 plot(mu_Y2)
 ```
 
-![](alternative_simulation_files/figure-gfm/unnamed-chunk-6-3.png)<!-- -->
+![](alternative_simulation_files/figure-gfm/unnamed-chunk-43-3.png)<!-- -->
 
 ## Combine Components
 
@@ -370,7 +322,7 @@ matplot(t(X),
         col=rgb(0,0,0,alpha=0.4))
 ```
 
-![](alternative_simulation_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
+![](alternative_simulation_files/figure-gfm/unnamed-chunk-50-1.png)<!-- -->
 
 ``` r
 # matlines(t(X[(non_outliers+1):n,]), 
@@ -386,7 +338,7 @@ matplot(t(Y),
         col=rgb(0,0,0,alpha=0.6))
 ```
 
-![](alternative_simulation_files/figure-gfm/unnamed-chunk-13-2.png)<!-- -->
+![](alternative_simulation_files/figure-gfm/unnamed-chunk-50-2.png)<!-- -->
 
 ``` r
 # matlines(t(Y[(non_outliers+1):n,]), 
@@ -427,8 +379,7 @@ res2 = FPCA(df$Component2,
                  kernel='epan',
                  verbose=TRUE))
 #> No binning is needed!
-#> 
-#> At most 29 number of PC can be selected, thresholded by `maxK` = 20.
+#> At most 32 number of PC can be selected, thresholded by `maxK` = 20.
 ```
 
 ``` r
@@ -450,7 +401,7 @@ hat %>%
   theme_bw()
 ```
 
-![](alternative_simulation_files/figure-gfm/unnamed-chunk-17-1.png)<!-- -->
+![](alternative_simulation_files/figure-gfm/unnamed-chunk-54-1.png)<!-- -->
 
 ``` r
 
@@ -464,7 +415,7 @@ res1$phi[, 1:3] %>%
   theme_bw()
 ```
 
-![](alternative_simulation_files/figure-gfm/unnamed-chunk-17-2.png)<!-- -->
+![](alternative_simulation_files/figure-gfm/unnamed-chunk-54-2.png)<!-- -->
 
 ``` r
 
@@ -476,7 +427,7 @@ res1$phi[, 1:3] %>%
   theme_bw()
 ```
 
-![](alternative_simulation_files/figure-gfm/unnamed-chunk-17-3.png)<!-- -->
+![](alternative_simulation_files/figure-gfm/unnamed-chunk-54-3.png)<!-- -->
 
 ``` r
 
@@ -488,7 +439,7 @@ res1$phi[, 1:3] %>%
   theme_bw()
 ```
 
-![](alternative_simulation_files/figure-gfm/unnamed-chunk-17-4.png)<!-- -->
+![](alternative_simulation_files/figure-gfm/unnamed-chunk-54-4.png)<!-- -->
 
 ### Compare to Actual: Second Component
 
@@ -500,7 +451,7 @@ hat %>%
   theme_bw()
 ```
 
-![](alternative_simulation_files/figure-gfm/unnamed-chunk-18-1.png)<!-- -->
+![](alternative_simulation_files/figure-gfm/unnamed-chunk-55-1.png)<!-- -->
 
 ``` r
 
@@ -514,7 +465,7 @@ res2$phi[, 1:3] %>%
   theme_bw()
 ```
 
-![](alternative_simulation_files/figure-gfm/unnamed-chunk-18-2.png)<!-- -->
+![](alternative_simulation_files/figure-gfm/unnamed-chunk-55-2.png)<!-- -->
 
 ``` r
 
@@ -526,7 +477,7 @@ res2$phi[, 1:3] %>%
   theme_bw()
 ```
 
-![](alternative_simulation_files/figure-gfm/unnamed-chunk-18-3.png)<!-- -->
+![](alternative_simulation_files/figure-gfm/unnamed-chunk-55-3.png)<!-- -->
 
 ``` r
 
@@ -538,7 +489,7 @@ res2$phi[, 1:3] %>%
   theme_bw()
 ```
 
-![](alternative_simulation_files/figure-gfm/unnamed-chunk-18-4.png)<!-- -->
+![](alternative_simulation_files/figure-gfm/unnamed-chunk-55-4.png)<!-- -->
 
 ## Irregular MFPCA
 
@@ -568,7 +519,7 @@ mfpca_eigenf %>%
   theme_bw()
 ```
 
-![](alternative_simulation_files/figure-gfm/unnamed-chunk-21-1.png)<!-- -->
+![](alternative_simulation_files/figure-gfm/unnamed-chunk-58-1.png)<!-- -->
 
 ``` r
 
@@ -580,7 +531,7 @@ mfpca_eigenf %>%
   theme_bw()
 ```
 
-![](alternative_simulation_files/figure-gfm/unnamed-chunk-21-2.png)<!-- -->
+![](alternative_simulation_files/figure-gfm/unnamed-chunk-58-2.png)<!-- -->
 
 ``` r
 
@@ -592,7 +543,7 @@ mfpca_eigenf %>%
   theme_bw()
 ```
 
-![](alternative_simulation_files/figure-gfm/unnamed-chunk-21-3.png)<!-- -->
+![](alternative_simulation_files/figure-gfm/unnamed-chunk-58-3.png)<!-- -->
 
 ``` r
 
@@ -605,7 +556,7 @@ mfpca_eigenf %>%
   theme_bw()
 ```
 
-![](alternative_simulation_files/figure-gfm/unnamed-chunk-21-4.png)<!-- -->
+![](alternative_simulation_files/figure-gfm/unnamed-chunk-58-4.png)<!-- -->
 
 ``` r
 
@@ -617,7 +568,7 @@ mfpca_eigenf %>%
   theme_bw()
 ```
 
-![](alternative_simulation_files/figure-gfm/unnamed-chunk-21-5.png)<!-- -->
+![](alternative_simulation_files/figure-gfm/unnamed-chunk-58-5.png)<!-- -->
 
 ``` r
 
@@ -629,7 +580,7 @@ mfpca_eigenf %>%
   theme_bw()
 ```
 
-![](alternative_simulation_files/figure-gfm/unnamed-chunk-21-6.png)<!-- -->
+![](alternative_simulation_files/figure-gfm/unnamed-chunk-58-6.png)<!-- -->
 
 ``` r
 eigens = data.frame(est1 = mfpca_eigens[,1],
@@ -648,7 +599,7 @@ eigens %>%
 #> `geom_smooth()` using formula = 'y ~ x'
 ```
 
-![](alternative_simulation_files/figure-gfm/unnamed-chunk-22-1.png)<!-- -->
+![](alternative_simulation_files/figure-gfm/unnamed-chunk-59-1.png)<!-- -->
 
 ``` r
 
@@ -661,7 +612,7 @@ eigens %>%
 #> `geom_smooth()` using formula = 'y ~ x'
 ```
 
-![](alternative_simulation_files/figure-gfm/unnamed-chunk-22-2.png)<!-- -->
+![](alternative_simulation_files/figure-gfm/unnamed-chunk-59-2.png)<!-- -->
 
 ``` r
 
@@ -674,7 +625,7 @@ eigens %>%
 #> `geom_smooth()` using formula = 'y ~ x'
 ```
 
-![](alternative_simulation_files/figure-gfm/unnamed-chunk-22-3.png)<!-- -->
+![](alternative_simulation_files/figure-gfm/unnamed-chunk-59-3.png)<!-- -->
 
 ## Prepare for Regression
 
@@ -698,7 +649,7 @@ res1_y = FPCA(df_y$Component1,
                  verbose=TRUE))
 #> No binning is needed!
 #> 
-#> At most 34 number of PC can be selected, thresholded by `maxK` = 20.
+#> At most 33 number of PC can be selected, thresholded by `maxK` = 20.
 
 res2_y = FPCA(df_y$Component2,
             df_y$Time,
@@ -729,8 +680,8 @@ B; mod$coefficients
 #> [1,]   -1   -1    5
 #> [2,]    2   -9    5
 #> [3,]    3    3   -3
-#>                 [,1]       [,2]      [,3]
-#> predictor1 -9.250464  0.6975899 1.0605221
-#> predictor2  4.133946 -1.4331826 2.2284085
-#> predictor3  3.409762  4.3814533 0.6101011
+#>                   [,1]       [,2]       [,3]
+#> predictor1 -10.1867957 -1.1775884  0.1921579
+#> predictor2  -0.5736344 -0.5205888 -2.5246496
+#> predictor3  -3.2014157  4.4673027 -0.2452748
 ```
